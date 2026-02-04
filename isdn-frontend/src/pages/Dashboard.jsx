@@ -4,13 +4,13 @@ import { DataTable } from "../components/data/DataTable";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { ArrowRight, AlertTriangle } from "lucide-react";
+import { stats, orders as recentOrders, products } from "../data/mockData";
 
-export function Dashboard({
-  stats,
-  recentOrders,
-  lowStockProducts,
-  onNavigate,
-}) {
+export function Dashboard() {
+  const lowStockProducts = products.filter(
+    (p) => p.status === "low_stock" || p.status === "out_of_stock",
+  );
+
   const orderColumns = [
     {
       key: "orderNumber",
@@ -61,7 +61,6 @@ export function Dashboard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onNavigate("orders")}
               rightIcon={<ArrowRight className="h-4 w-4" />}
             >
               <span className="hidden sm:inline">View All</span>
@@ -84,7 +83,6 @@ export function Dashboard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onNavigate("inventory")}
               rightIcon={<ArrowRight className="h-4 w-4" />}
             >
               Manage

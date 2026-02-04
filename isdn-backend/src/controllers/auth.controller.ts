@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import userService from "../services/user.service";
 import { CreateUserDto, LoginDto, JwtPayload } from "../types";
 import { serializeBigInt } from "../utils/serializer";
+import prisma from "../../config/database";
 
 class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -160,12 +161,53 @@ class AuthController {
 
       const user = await userService.getUserById(userId);
       // Remove password from response
-      const { password: _, ...userWithoutPassword } = user;
+      // const { password: _, ...userWithoutPassword } = user;
 
       res.json({
         success: true,
-        data: serializeBigInt(userWithoutPassword),
+        data: serializeBigInt(user),
         message: "Current user retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Extract token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        res.status(401).json({
+          success: false,
+          message: "No token provided",
+        });
+        return;
+      }
+
+      const token = authHeader.substring(7); // Remove "Bearer " prefix
+
+      // Decode token to get expiration time
+      const decoded = jwt.decode(token) as JwtPayload & { exp: number };
+      if (!decoded || !decoded.exp) {
+        res.status(400).json({
+          success: false,
+          message: "Invalid token",
+        });
+        return;
+      }
+
+      // Add token to blacklist with its expiration time
+      await prisma.blacklistedToken.create({
+        data: {
+          token,
+          expiresAt: new Date(decoded.exp * 1000), // Convert to milliseconds
+        },
+      });
+
+      res.json({
+        success: true,
+        message: "Logout successful",
       });
     } catch (error) {
       next(error);

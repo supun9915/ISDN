@@ -5,11 +5,27 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
 import { Search, Download, Filter } from "lucide-react";
+import { orders as initialOrders } from "../data/mockData";
 
-export function Orders({ orders, onUpdateStatus, onDeleteOrder }) {
+export function Orders() {
+  const [orders, setOrders] = useState(initialOrders);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+
+  const handleUpdateStatus = (order) => {
+    console.log("Updating order:", order);
+  };
+
+  const handleDeleteOrder = (order) => {
+    if (confirm(`Cancel order ${order.orderNumber}?`)) {
+      setOrders(
+        orders.map((o) =>
+          o.id === order.id ? { ...o, status: "cancelled" } : o,
+        ),
+      );
+    }
+  };
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -123,8 +139,8 @@ export function Orders({ orders, onUpdateStatus, onDeleteOrder }) {
         data={filteredOrders}
         columns={columns}
         keyField="id"
-        onEdit={onUpdateStatus}
-        onDelete={onDeleteOrder}
+        onEdit={handleUpdateStatus}
+        onDelete={handleDeleteOrder}
       />
     </div>
   );

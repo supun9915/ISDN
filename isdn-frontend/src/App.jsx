@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { MainLayout } from "./components/layout/MainLayout";
-import { Dashboard } from "./pages/Dashboard";
-import { Inventory } from "./pages/Inventory";
-import { Orders } from "./pages/Orders";
 import { Login } from "./pages/Login";
 import { ToastContainer } from "./components/feedback/ToastContainer";
 import { useToast } from "./hooks/useToast";
-import {
-  branches,
-  products as initialProducts,
-  orders as initialOrders,
-  stats,
-} from "./data/mockData";
+import { branches } from "./data/mockData";
 import { apiAdapter } from "./services/apiAdapter";
+import { getRouteComponent } from "./routes";
 
 // Mock User
 const currentUser = {
@@ -24,21 +17,49 @@ const currentUser = {
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
 };
 
+// Helper functions to get data from localStorage
+const getCurrentUser = () => {
+  const userStr = localStorage.getItem("user");
+  return userStr ? JSON.parse(userStr) : null;
+};
+
+const getCurrentBranchId = () => {
+  return localStorage.getItem("branchId");
+};
+
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activePage, setActivePage] = useState("dashboard");
   const [currentBranchId, setCurrentBranchId] = useState("1");
-  const [products, setProducts] = useState(initialProducts);
-  const [orders, setOrders] = useState(initialOrders);
   const { toasts, addToast, removeToast } = useToast();
 
-  // Initialize authentication state from localStorage
+  // Initialize authentication state from localStorage and fetch current user
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedBranchId = apiAdapter.getCurrentBranchId();
+    const token = apiAdapter.getToken();
+    const storedBranchId = getCurrentBranchId();
 
     if (token) {
       setIsAuthenticated(true);
+
+      // Fetch fresh user data from API (optional - comment out if endpoint doesn't exist yet)
+      // apiAdapter
+      //   .post("/auth/refresh")
+      //   .then((response) => {
+      //     if (response.success && response.data) {
+      //       // Update localStorage with fresh data
+      //       localStorage.setItem("user", JSON.stringify(response.data));
+      //       localStorage.setItem("branchId", response.data.branchId);
+      //       localStorage.setItem("username", response.data.username);
+      //       localStorage.setItem("userRole", response.data.role.roleName);
+      //       setCurrentBranchId(response.data.branchId);
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error("Failed to refresh user data", error);
+      //     // If token is invalid, logout
+      //     apiAdapter.removeToken();
+      //     setIsAuthenticated(false);
+      //   });
     }
 
     if (storedBranchId) {
@@ -52,8 +73,8 @@ export function App() {
   // Auth Handlers
   const handleLogin = () => {
     setIsAuthenticated(true);
-    const user = apiAdapter.getCurrentUser();
-    const userBranchId = apiAdapter.getCurrentBranchId();
+    const user = getCurrentUser();
+    const userBranchId = getCurrentBranchId();
 
     if (userBranchId) {
       setCurrentBranchId(userBranchId);
@@ -61,15 +82,28 @@ export function App() {
 
     addToast(
       "success",
-      `Welcome back, ${user?.name || "User"}! You have successfully signed in.`,
+      `Welcome back, ${user?.name || user?.username || "User"}! You have successfully signed in.`,
     );
   };
 
   const handleLogout = () => {
-    apiAdapter.logout();
+    // Clear all auth data from localStorage
+    apiAdapter.removeToken();
+    localStorage.removeItem("user");
+    localStorage.removeItem("branchId");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userRole");
+
+    // Update state to navigate to login
     setIsAuthenticated(false);
     setActivePage("dashboard");
+
     addToast("info", "You have been signed out.");
+
+    // Optionally call logout API (don't wait for response)
+    apiAdapter.post("/auth/logout").catch((error) => {
+      console.error("Logout API call failed:", error);
+    });
   };
 
   // Handlers
@@ -82,90 +116,20 @@ export function App() {
     );
   };
 
-  const handleAddProduct = (product) => {
-    const newProduct = {
-      ...product,
-      id: Math.random().toString(36).substr(2, 9),
-      lastUpdated: new Date().toISOString().split("T")[0],
-    };
-    setProducts([newProduct, ...products]);
-    addToast("success", "Product added successfully to inventory");
-  };
-
-  const handleEditProduct = (product) => {
-    addToast("info", `Editing ${product.name} (Demo only)`);
-  };
-
-  const handleDeleteProduct = (product) => {
-    if (confirm(`Are you sure you want to delete ${product.name}?`)) {
-      setProducts(products.filter((p) => p.id !== product.id));
-      addToast("warning", "Product removed from inventory");
-    }
-  };
-
-  const handleUpdateOrder = (order) => {
-    addToast("info", `Updating order ${order.orderNumber} (Demo only)`);
-  };
-
-  const handleDeleteOrder = (order) => {
-    if (confirm(`Cancel order ${order.orderNumber}?`)) {
-      setOrders(
-        orders.map((o) =>
-          o.id === order.id
-            ? {
-                ...o,
-                status: "cancelled",
-              }
-            : o,
-        ),
-      );
-      addToast("error", `Order ${order.orderNumber} cancelled`);
-    }
-  };
-
   // Page Routing
   const renderPage = () => {
-    switch (activePage) {
-      case "dashboard":
-        return (
-          <Dashboard
-            stats={stats}
-            recentOrders={orders}
-            lowStockProducts={products.filter(
-              (p) => p.status === "low_stock" || p.status === "out_of_stock",
-            )}
-            onNavigate={setActivePage}
-          />
-        );
+    const PageComponent = getRouteComponent(activePage);
 
-      case "inventory":
-        return (
-          <Inventory
-            products={products}
-            branches={branches}
-            onAddProduct={handleAddProduct}
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleDeleteProduct}
-          />
-        );
-
-      case "orders":
-        return (
-          <Orders
-            orders={orders}
-            onUpdateStatus={handleUpdateOrder}
-            onDeleteOrder={handleDeleteOrder}
-          />
-        );
-
-      default:
-        return (
-          <div className="flex flex-col items-center justify-center h-96 text-slate-500">
-            <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
-            <p>The {activePage} module is currently under development.</p>
-          </div>
-        );
+    if (PageComponent) {
+      return <PageComponent />;
     }
+
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-slate-500">
+        <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
+        <p>The {activePage} module is currently under development.</p>
+      </div>
+    );
   };
 
   // Show Login page if not authenticated

@@ -6,14 +6,10 @@ import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
 import { Modal } from "../components/feedback/Modal";
 import { Plus, Search, Filter } from "lucide-react";
+import { branches, products as initialProducts } from "../data/mockData";
 
-export function Inventory({
-  products,
-  branches,
-  onAddProduct,
-  onEditProduct,
-  onDeleteProduct,
-}) {
+export function Inventory() {
+  const [products, setProducts] = useState(initialProducts);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBranch, setFilterBranch] = useState("all");
@@ -68,9 +64,28 @@ export function Inventory({
     },
   ];
 
+  const handleAddProduct = (product) => {
+    const newProduct = {
+      ...product,
+      id: Math.random().toString(36).substr(2, 9),
+      lastUpdated: new Date().toISOString().split("T")[0],
+    };
+    setProducts([newProduct, ...products]);
+  };
+
+  const handleEditProduct = (product) => {
+    console.log("Editing product:", product);
+  };
+
+  const handleDeleteProduct = (product) => {
+    if (confirm(`Are you sure you want to delete ${product.name}?`)) {
+      setProducts(products.filter((p) => p.id !== product.id));
+    }
+  };
+
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    onAddProduct({
+    handleAddProduct({
       name: "New Product Demo",
       code: `PRD-${Math.floor(Math.random() * 1000)}`,
       quantity: 100,
@@ -159,8 +174,8 @@ export function Inventory({
         data={filteredProducts}
         columns={columns}
         keyField="id"
-        onEdit={onEditProduct}
-        onDelete={onDeleteProduct}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
       />
 
       {/* Add Stock Modal */}

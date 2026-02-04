@@ -25,12 +25,26 @@ class UserRepository {
     });
   }
 
+  async findByBranchId(branchId: string): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: { branchId: BigInt(branchId) },
+      include: {
+        role: true,
+        branch: true,
+        assignedBranch: true,
+        vehicle: true,
+      },
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { email },
       include: {
         role: true,
         branch: true,
+        assignedBranch: true,
+        vehicle: true,
       },
     });
   }

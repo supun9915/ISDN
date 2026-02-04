@@ -10,7 +10,8 @@ class UserController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const users = await userService.getAllUsers();
+      const branchId = req.headers.branchid as string | undefined;
+      const users = await userService.getAllUsers(branchId);
       // Remove password from response
       const sanitizedUsers = users.map((user) => {
         const { password, ...userWithoutPassword } = user;
@@ -33,8 +34,9 @@ class UserController {
   ): Promise<void> {
     try {
       const { id } = req.params;
-      const user = await userService.getUserById(id as string);
+      const users = await userService.getUserById(id as string);
       // Remove password from response
+      const user = users[0];
       const { password, ...userWithoutPassword } = user;
       res.json({
         success: true,

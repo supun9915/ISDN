@@ -69,94 +69,56 @@ class ApiAdapter {
   }
 
   /**
-   * Login user
-   */
-  async login(credentials) {
-    const response = await this.request("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(credentials),
-    });
-
-    // Store token and user data in localStorage
-    if (response.success && response.data) {
-      this.setToken(response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("branchId", response.data.user.branchId);
-      localStorage.setItem("username", response.data.user.username);
-      localStorage.setItem("userRole", response.data.user.role.roleName);
-    }
-
-    return response;
-  }
-
-  /**
-   * Logout user
-   */
-  logout() {
-    this.removeToken();
-    localStorage.removeItem("user");
-    localStorage.removeItem("branchId");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userRole");
-  }
-
-  /**
-   * Get current user from localStorage
-   */
-  getCurrentUser() {
-    const userStr = localStorage.getItem("user");
-    return userStr ? JSON.parse(userStr) : null;
-  }
-
-  /**
-   * Get current branch ID from localStorage
-   */
-  getCurrentBranchId() {
-    return localStorage.getItem("branchId");
-  }
-
-  /**
    * GET request
    */
-  async get(endpoint) {
-    return this.request(endpoint, { method: "GET" });
+  async get(endpoint, headers = {}) {
+    return this.request(endpoint, {
+      method: "GET",
+      headers,
+    });
   }
 
   /**
    * POST request
    */
-  async post(endpoint, data) {
+  async post(endpoint, data, headers = {}) {
     return this.request(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
+      headers,
     });
   }
 
   /**
    * PUT request
    */
-  async put(endpoint, data) {
+  async put(endpoint, data, headers = {}) {
     return this.request(endpoint, {
       method: "PUT",
       body: JSON.stringify(data),
+      headers,
     });
   }
 
   /**
    * PATCH request
    */
-  async patch(endpoint, data) {
+  async patch(endpoint, data, headers = {}) {
     return this.request(endpoint, {
       method: "PATCH",
       body: JSON.stringify(data),
+      headers,
     });
   }
 
   /**
    * DELETE request
    */
-  async delete(endpoint) {
-    return this.request(endpoint, { method: "DELETE" });
+  async delete(endpoint, headers = {}) {
+    return this.request(endpoint, {
+      method: "DELETE",
+      headers,
+    });
   }
 }
 
