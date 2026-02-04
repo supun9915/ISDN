@@ -117,11 +117,6 @@ class UserService {
     await this.getUserById(id);
     return await userRepository.update(id, { active: true });
   }
-
-  async deactivateUser(id: string | number): Promise<User> {
-    await this.getUserById(id);
-    return await userRepository.update(id, { active: false });
-  }
 }
 
 export default new UserService();
