@@ -134,7 +134,7 @@ class UserController {
       const { password, ...userWithoutPassword } = updatedUser;
       res.json({
         success: true,
-        data: userWithoutPassword,
+        data: serializeBigInt(userWithoutPassword),
         message: "User activated successfully",
       });
     } catch (error) {

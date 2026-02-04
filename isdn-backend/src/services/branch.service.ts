@@ -59,11 +59,6 @@ class BranchService {
     await this.getBranchById(id);
     return await branchRepository.update(id, { active: true });
   }
-
-  async deactivateBranch(id: string | number): Promise<Branch> {
-    await this.getBranchById(id);
-    return await branchRepository.update(id, { active: false });
-  }
 }
 
 export default new BranchService();

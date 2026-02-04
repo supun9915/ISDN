@@ -7,34 +7,34 @@ const router = express.Router();
 // All branch routes require authentication
 router.use(authenticate);
 
-// Get all branches (accessible to all authenticated users)
+// Get all branches
 router.get("/", branchController.getAllBranches);
 
-// Get branch by ID (accessible to all authenticated users)
+// Get branch by ID
 router.get("/:id", branchController.getBranchById);
 
-// Create new branch (admin and manager only)
+// Create new branch
 router.post(
   "/",
   authorize(["Super Admin", "Admin"]),
   branchController.createBranch,
 );
 
-// Update branch (admin and manager only)
+// Update branch
 router.put(
   "/:id",
   authorize(["Super Admin", "Admin"]),
   branchController.updateBranch,
 );
 
-// Delete branch (admin only)
+// Delete branch
 router.delete(
   "/:id",
   authorize(["Super Admin"]),
   branchController.deleteBranch,
 );
 
-// Activate branch (admin and manager only)
+// Activate branch
 router.patch(
   "/:id/activate",
   authorize(["Super Admin", "Admin"]),

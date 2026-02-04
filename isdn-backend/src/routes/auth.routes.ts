@@ -4,13 +4,13 @@ import { authenticate } from "../middleware/auth";
 
 const router = express.Router();
 
-// POST /api/auth/login
+// user login
 router.post("/login", authController.login);
 
-// POST /api/auth/register
+// user registration
 router.post("/register", authController.register);
 
-// GET /api/auth/me (requires authentication)
-router.get("/me", authenticate, authController.getCurrentUser);
+// get current user
+router.get("/log", authenticate, authController.getCurrentUser);
 
 export default router;

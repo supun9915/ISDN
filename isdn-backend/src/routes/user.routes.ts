@@ -4,14 +4,14 @@ import { authenticate, authorize } from "../middleware/auth";
 
 const router = express.Router();
 
-// Change password (requires authentication)
+// Change password
 router.patch(
   "/:id/change-password",
   authenticate,
   userController.changePassword,
 );
 
-// Get all users (requires authentication and admin role)
+// Get all users
 router.get(
   "/",
   authenticate,
@@ -19,10 +19,15 @@ router.get(
   userController.getAllUsers,
 );
 
-// Get user by ID (requires authentication)
-router.get("/:id", authenticate, userController.getUserById);
+// Get user by ID
+router.get(
+  "/:id",
+  authenticate,
 
-// Create new user (requires authentication and admin role)
+  userController.getUserById,
+);
+
+// Create new user
 router.post(
   "/",
   authenticate,
@@ -30,10 +35,10 @@ router.post(
   userController.createUser,
 );
 
-// Update user (requires authentication)
+// Update user
 router.put("/:id", authenticate, userController.updateUser);
 
-// Delete user (requires authentication and admin role)
+// Delete user
 router.delete(
   "/:id",
   authenticate,
@@ -41,7 +46,7 @@ router.delete(
   userController.deleteUser,
 );
 
-// Activate user (requires authentication and admin role)
+// Activate user
 router.patch(
   "/:id/activate",
   authenticate,
