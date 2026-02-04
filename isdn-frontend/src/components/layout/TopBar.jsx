@@ -9,14 +9,17 @@ export function TopBar({ user, onMenuClick }) {
 
   useEffect(() => {
     // Get user details from localStorage
-    const storedUser = apiAdapter.getCurrentUser();
+
+    const userStr = localStorage.getItem("user");
+    const storedUser = userStr ? JSON.parse(userStr) : null;
+
     if (storedUser) {
       setLoggedUser({
         id: storedUser.id,
         name: storedUser.name,
         email: storedUser.email,
-        role: "admin", // Map from roleId or use storedUser.role.roleName
-        avatar: user.avatar,
+        role: storedUser.role?.roleName || "admin", // Map from roleId or use storedUser.role.roleName
+        avatar: null, // Fallback to passed user avatar,
       });
     }
   }, [user]);
@@ -95,15 +98,18 @@ export function TopBar({ user, onMenuClick }) {
         <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-slate-200">
           <div className="text-right hidden lg:block">
             <p className="text-sm font-semibold text-slate-900">
-              {loggedUser.name}
+              {loggedUser?.name || "User"}
             </p>
             <p className="text-xs text-slate-500">
-              {apiAdapter.getCurrentUser()?.role.roleName || "User"}
+              {loggedUser?.role
+                ? loggedUser.role.charAt(0).toUpperCase() +
+                  loggedUser.role.slice(1)
+                : "User"}
             </p>
           </div>
           <Avatar
-            fallback={loggedUser.name}
-            src={loggedUser.avatar}
+            fallback={loggedUser?.name || "U"}
+            src={loggedUser?.avatar}
             size="sm"
           />
         </div>

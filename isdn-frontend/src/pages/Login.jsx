@@ -16,9 +16,19 @@ export function Login({ onLogin }) {
     setIsLoading(true);
 
     try {
-      const response = await apiAdapter.login({ username, password });
+      const response = await apiAdapter.post("/auth/login", {
+        username,
+        password,
+      });
 
-      if (response.success) {
+      if (response.success && response.data) {
+        // Store token and user data in localStorage
+        apiAdapter.setToken(response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("branchId", response.data.user.branchId);
+        localStorage.setItem("username", response.data.user.username);
+        localStorage.setItem("userRole", response.data.user.role.roleName);
+
         // Login successful, navigate to dashboard
         onLogin();
       } else {
@@ -98,6 +108,7 @@ export function Login({ onLogin }) {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your username"
+                    autoComplete="username"
                     required
                     className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
@@ -118,6 +129,7 @@ export function Login({ onLogin }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     required
                     className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-11 pr-12 text-sm placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />

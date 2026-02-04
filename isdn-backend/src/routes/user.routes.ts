@@ -12,20 +12,10 @@ router.patch(
 );
 
 // Get all users
-router.get(
-  "/",
-  authenticate,
-  authorize(["Super Admin", "Admin"]),
-  userController.getAllUsers,
-);
+router.get("/", authenticate, userController.getAllUsers);
 
 // Get user by ID
-router.get(
-  "/:id",
-  authenticate,
-
-  userController.getUserById,
-);
+router.get("/:id", authenticate, userController.getUserById);
 
 // Create new user
 router.post(

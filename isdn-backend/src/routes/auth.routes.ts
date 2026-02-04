@@ -13,4 +13,7 @@ router.post("/register", authController.register);
 // get current user
 router.get("/log", authenticate, authController.getCurrentUser);
 
+// logout
+router.post("/logout", authenticate, authController.logout);
+
 export default router;

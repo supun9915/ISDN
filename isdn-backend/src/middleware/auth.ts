@@ -36,7 +36,45 @@ interface AuthenticatedRequest extends Request {
   user?: User;
 }
 
-const authenticate = passport.authenticate("jwt", { session: false });
+const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate(
+    "jwt",
+    { session: false },
+    async (err: any, user: any, info: any) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: info?.message || "Unauthorized",
+        });
+      }
+
+      // Check if token is blacklisted
+      const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+      if (token) {
+        try {
+          const blacklistedToken = await prisma.blacklistedToken.findUnique({
+            where: { token },
+          });
+          if (blacklistedToken) {
+            return res.status(401).json({
+              success: false,
+              message: "Token has been revoked",
+            });
+          }
+        } catch (error) {
+          return next(error);
+        }
+      }
+
+      req.user = user;
+      next();
+    },
+  )(req, res, next);
+};
 
 const authorize = (roles: string[]) => {
   return (

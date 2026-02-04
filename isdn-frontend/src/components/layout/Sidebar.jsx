@@ -1,4 +1,5 @@
-import React from "react";
+import { useState, useEffect } from "react";
+
 import {
   LayoutDashboard,
   Package,
@@ -22,6 +23,26 @@ export function Sidebar({
   isOpen = false,
   onClose,
 }) {
+  const [loggedUser, setLoggedUser] = useState(null);
+
+  useEffect(() => {
+    // Get user details from localStorage
+
+    const userStr = localStorage.getItem("user");
+    const storedUser = userStr ? JSON.parse(userStr) : null;
+
+    if (storedUser) {
+      setLoggedUser({
+        id: storedUser.id,
+        name: storedUser.name,
+        email: storedUser.email,
+        role: storedUser.role?.roleName, // Map from roleId or use storedUser.role.roleName
+        branchname: storedUser.branch?.name,
+        avatar: null, // Fallback to passed user avatar,
+      });
+    }
+  }, []);
+
   const navItems = [
     {
       id: "dashboard",
@@ -72,21 +93,9 @@ export function Sidebar({
     >
       {/* Logo Area */}
       <div className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-800 bg-slate-950">
-        <div className="flex items-center gap-3 text-white">
-          <div className="bg-blue-600 p-1.5 rounded-lg">
-            <Truck className="h-5 w-5" />
-          </div>
-          <span className="font-bold text-lg tracking-tight">
-            IslandLink<span className="text-blue-500">.sys</span>
-          </span>
+        <div className="flex items-center text-white bg-slate-50 rounded-lg p-1.5 w-full">
+          <img src="/isdnlogo.png" alt="ISDN Logo" className="h-10 w-auto" />
         </div>
-        {/* Mobile Close Button */}
-        <button
-          onClick={onClose}
-          className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-        >
-          <X className="h-5 w-5" />
-        </button>
       </div>
 
       {/* Branch Switcher */}
@@ -94,20 +103,28 @@ export function Sidebar({
         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block px-2">
           Current Branch
         </label>
-        <div className="relative">
-          <select
-            value={currentBranch.id}
-            onChange={(e) => onSwitchBranch(e.target.value)}
-            className="w-full appearance-none bg-slate-800 border border-slate-700 text-white text-sm rounded-lg pl-3 pr-10 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer hover:bg-slate-750 transition-colors"
-          >
-            {branches.map((branch) => (
-              <option key={branch.id} value={branch.id}>
-                {branch.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
-        </div>
+
+        {/* if logged user rolename = Super admin show branch list else shwoing current branch */}
+        {loggedUser?.role === "Super Admin" ? (
+          <div className="relative">
+            <select
+              value={currentBranch.id}
+              onChange={(e) => onSwitchBranch(e.target.value)}
+              className="w-full appearance-none bg-slate-800 border border-slate-700 text-white text-sm rounded-lg pl-3 pr-10 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer hover:bg-slate-750 transition-colors"
+            >
+              {branches.map((branch) => (
+                <option key={branch.id} value={branch.id}>
+                  {branch.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
+          </div>
+        ) : (
+          <div className="text-sm font-medium text-slate-200 px-2 py-2.5 bg-slate-800 rounded-lg">
+            {loggedUser?.branchname || "User Branch"}
+          </div>
+        )}
       </div>
 
       {/* Navigation */}

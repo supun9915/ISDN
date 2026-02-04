@@ -258,3 +258,13 @@ model Promotion {
 
   @@map("promotion")
 }
+
+model BlacklistedToken {
+  id        BigInt   @id @default(autoincrement())
+  token     String   @unique @db.VarChar(500)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("blacklisted_token")
+}

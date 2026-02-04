@@ -3,8 +3,13 @@ import bcrypt from "bcryptjs";
 import { User, CreateUserDto, UpdateUserDto } from "../types";
 
 class UserService {
-  async getAllUsers(): Promise<User[]> {
-    return await userRepository.findAll();
+  async getAllUsers(branchId: string | undefined): Promise<User[]> {
+    if (branchId) {
+      // Assuming you want to get all users for a branch, use a suitable repository method
+      return await userRepository.findByBranchId(branchId);
+    } else {
+      return await userRepository.findAll();
+    }
   }
 
   async getUserById(id: string | number): Promise<User> {
@@ -99,7 +104,8 @@ class UserService {
     oldPassword: string,
     newPassword: string,
   ): Promise<User> {
-    const user = await this.getUserById(id);
+    const users = await this.getUserById(id);
+    const user = users[0];
 
     // Verify old password
     const isValidPassword = await bcrypt.compare(oldPassword, user.password);
