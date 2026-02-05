@@ -18,12 +18,7 @@ router.get("/", authenticate, userController.getAllUsers);
 router.get("/:id", authenticate, userController.getUserById);
 
 // Create new user
-router.post(
-  "/",
-  authenticate,
-  authorize(["Super Admin", "Admin"]),
-  userController.createUser,
-);
+router.post("/", userController.createUser);
 
 // Update user
 router.put("/:id", authenticate, userController.updateUser);

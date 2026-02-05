@@ -59,10 +59,22 @@ class UserRepository {
     });
   }
 
-  async create(userData: CreateUserDto): Promise<User> {
+  async create(
+    userData: CreateUserDto & { vehicleId?: bigint },
+  ): Promise<User> {
     return await prisma.user.create({
       data: {
-        ...userData,
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        name: userData.name,
+        contactNumber: userData.contactNumber,
+        businessName: userData.businessName,
+        customerCode: userData.customerCode,
+        address: userData.address,
+        district: userData.district,
+        customerType: userData.customerType,
+        licenseNumber: userData.licenseNumber,
         roleId: BigInt(userData.roleId),
         branchId: userData.branchId ? BigInt(userData.branchId) : null,
         assignedBranchId: userData.assignedBranchId
@@ -114,6 +126,14 @@ class UserRepository {
       where: { id: BigInt(id) },
       data: { password: hashedPassword },
     });
+  }
+
+  async getRoleNameById(roleId: bigint): Promise<string | null> {
+    const role = await prisma.role.findUnique({
+      where: { id: BigInt(roleId) },
+      select: { roleName: true },
+    });
+    return role?.roleName || null;
   }
 }
 

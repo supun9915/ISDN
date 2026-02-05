@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/client";
+
 export interface User {
   id: bigint;
   username: string;
@@ -51,7 +53,10 @@ export interface CreateUserDto {
   customerType?: string;
   assignedBranchId?: bigint;
   branchId?: bigint;
-  vehicleId?: bigint;
+  vehicleNumber?: string;
+  vehicleType?: string;
+  vehicleBrand?: string;
+  vehicleCapacity?: Decimal;
   licenseNumber?: string;
 }
 
@@ -114,4 +119,15 @@ export interface JwtPayload {
   roleId: string;
   iat?: number;
   exp?: number;
+}
+
+export interface Vehicle {
+  id: bigint;
+  vehicleNumber: string;
+  vehicleType: string;
+  brand: string;
+  capacityKg: Decimal;
+  branchId?: bigint | null;
+  createdAt: Date;
+  updatedAt: Date;
 }

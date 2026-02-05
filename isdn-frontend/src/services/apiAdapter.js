@@ -71,10 +71,11 @@ class ApiAdapter {
   /**
    * GET request
    */
-  async get(endpoint, headers = {}) {
+  async get(endpoint, headers = {}, params = {}) {
     return this.request(endpoint, {
       method: "GET",
       headers,
+      params,
     });
   }
 

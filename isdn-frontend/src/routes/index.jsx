@@ -3,6 +3,8 @@ import { Dashboard } from "../pages/Dashboard";
 import { Inventory } from "../pages/Inventory";
 import { Orders } from "../pages/Orders";
 import { Users } from "../pages/Users/Users";
+import { Drivers } from "../pages/Drivers/Drivers";
+import { Customers } from "../pages/Customers/Customers";
 
 export const routes = [
   {
@@ -21,9 +23,19 @@ export const routes = [
     label: "Orders",
   },
   {
-    path: "users",
+    path: "adminUsers",
     element: Users,
-    label: "Users",
+    label: "Admin Users",
+  },
+  {
+    path: "drivers",
+    element: Drivers,
+    label: "Drivers",
+  },
+  {
+    path: "customers",
+    element: Customers,
+    label: "Customers",
   },
 ];
 

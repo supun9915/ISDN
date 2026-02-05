@@ -78,19 +78,30 @@ export function DataTable({ data, columns, onEdit, onDelete, keyField }) {
                   key={String(item[keyField])}
                   className="hover:bg-slate-50 transition-colors"
                 >
-                  {columns.map((column) => (
-                    <td
-                      key={String(column.key)}
-                      className={`
-                        px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-slate-700 text-xs sm:text-sm
-                        ${getColumnClasses(column)}
-                      `}
-                    >
-                      {column.render
-                        ? column.render(item[column.key], item)
-                        : String(item[column.key])}
-                    </td>
-                  ))}
+                  {columns.map((column) => {
+                    const cellValue = column.render
+                      ? column.render(item[column.key], item)
+                      : item[column.key];
+
+                    const displayValue =
+                      cellValue === null ||
+                      cellValue === undefined ||
+                      cellValue === ""
+                        ? "N/A"
+                        : cellValue;
+
+                    return (
+                      <td
+                        key={String(column.key)}
+                        className={`
+                          px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-slate-700 text-xs sm:text-sm
+                          ${getColumnClasses(column)}
+                        `}
+                      >
+                        {displayValue}
+                      </td>
+                    );
+                  })}
                   {(onEdit || onDelete) && (
                     <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-right sticky right-0 bg-white">
                       <div className="flex justify-end gap-1 sm:gap-2">

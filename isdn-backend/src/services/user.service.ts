@@ -1,15 +1,27 @@
 import userRepository from "../repositories/user.repository";
+import vehicleRepository from "../repositories/vehicle.repository";
 import bcrypt from "bcryptjs";
 import { User, CreateUserDto, UpdateUserDto } from "../types";
 
 class UserService {
-  async getAllUsers(branchId: string | undefined): Promise<User[]> {
+  async getAllUsers(
+    branchId: string | undefined,
+    roleId: string | undefined,
+  ): Promise<User[]> {
+    let users: User[];
+
     if (branchId) {
-      // Assuming you want to get all users for a branch, use a suitable repository method
-      return await userRepository.findByBranchId(branchId);
+      users = await userRepository.findByBranchId(branchId);
     } else {
-      return await userRepository.findAll();
+      users = await userRepository.findAll();
     }
+
+    // Apply roleId filter if provided
+    if (roleId) {
+      users = users.filter((user) => user.roleId === BigInt(roleId));
+    }
+
+    return users;
   }
 
   async getUserById(id: string | number): Promise<User> {
@@ -53,12 +65,83 @@ class UserService {
       throw new Error("User with this username already exists");
     }
 
-    // Hash password
+    // if role name is Driver, ensure vehicle details are provided
+    const roleName = await userRepository.getRoleNameById(userData.roleId);
+    if (roleName === "Driver") {
+      if (
+        !userData.vehicleNumber ||
+        !userData.vehicleType ||
+        !userData.vehicleBrand ||
+        !userData.vehicleCapacity
+      ) {
+        throw new Error("Vehicle details are required for Driver role");
+      }
+      // Validate vehicle capacity is a positive integer
+      if (Number(userData.vehicleCapacity) <= 0) {
+        throw new Error("Vehicle capacity must be a positive integer");
+      }
+
+      // Check if vehicle number already exists
+      const existingVehicle = await vehicleRepository.findByVehicleNumber(
+        userData.vehicleNumber,
+      );
+      if (existingVehicle) {
+        throw new Error("Vehicle number already exists");
+      }
+
+      // Create vehicle
+      const vehicle = await vehicleRepository.create({
+        vehicleNumber: userData.vehicleNumber,
+        vehicleType: userData.vehicleType,
+        brand: userData.vehicleBrand,
+        capacityKg: userData.vehicleCapacity,
+        branchId: userData.branchId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Hash password and create user with vehicle ID
+      const hashedPassword = await bcrypt.hash(userData.password, 12);
+
+      const newUserData = {
+        username: userData.username,
+        email: userData.email,
+        password: hashedPassword,
+        roleId: userData.roleId,
+        name: userData.name,
+        contactNumber: userData.contactNumber,
+        businessName: userData.businessName || undefined,
+        customerCode: userData.customerCode || undefined,
+        address: userData.address || undefined,
+        district: userData.district || undefined,
+        customerType: userData.customerType || undefined,
+        assignedBranchId: userData.assignedBranchId,
+        branchId: userData.branchId,
+        vehicleId: vehicle.id,
+        licenseNumber: userData.licenseNumber || undefined,
+      };
+
+      return await userRepository.create(newUserData);
+    }
+
+    // Hash password for non-driver users
     const hashedPassword = await bcrypt.hash(userData.password, 12);
 
     const newUserData = {
-      ...userData,
+      username: userData.username,
+      email: userData.email,
       password: hashedPassword,
+      roleId: userData.roleId,
+      name: userData.name,
+      contactNumber: userData.contactNumber,
+      businessName: userData.businessName || undefined,
+      customerCode: userData.customerCode || undefined,
+      address: userData.address || undefined,
+      district: userData.district || undefined,
+      customerType: userData.customerType || undefined,
+      assignedBranchId: userData.assignedBranchId,
+      branchId: userData.branchId,
+      licenseNumber: userData.licenseNumber || undefined,
     };
 
     return await userRepository.create(newUserData);
@@ -104,8 +187,7 @@ class UserService {
     oldPassword: string,
     newPassword: string,
   ): Promise<User> {
-    const users = await this.getUserById(id);
-    const user = users[0];
+    const user = await this.getUserById(id);
 
     // Verify old password
     const isValidPassword = await bcrypt.compare(oldPassword, user.password);
