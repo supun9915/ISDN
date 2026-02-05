@@ -1,0 +1,345 @@
+import React, { useState, useEffect } from "react";
+import { Modal } from "../../../components/feedback/Modal";
+import { Button } from "../../../components/ui/Button";
+import { Input } from "../../../components/ui/Input";
+import { Select } from "../../../components/ui/Select";
+
+export function CustomersUpdateModel({
+  isOpen,
+  onClose,
+  onSubmit,
+  customer,
+  roles,
+  branches,
+}) {
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    roleId: "",
+    branchId: "",
+    contactNumber: "",
+    businessName: "",
+    customerCode: "",
+    address: "",
+    district: "",
+    customerType: "",
+    assignedBranchId: "",
+    licenseNumber: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  // Update form data when user changes
+  useEffect(() => {
+    if (customer) {
+      setFormData({
+        name: customer.name || "",
+        username: customer.username || "",
+        email: customer.email || "",
+        password: "", // Don't pre-fill password
+        roleId: customer.roleId || "",
+        branchId: customer.branchId || "",
+        contactNumber: customer.contactNumber || "",
+        businessName: customer.businessName || "",
+        customerCode: customer.customerCode || "",
+        address: customer.address || "",
+        district: customer.district || "",
+        customerType: customer.customerType || "",
+        assignedBranchId: customer.assignedBranchId || "",
+        licenseNumber: customer.licenseNumber || "",
+      });
+    }
+  }, [customer]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      // Update customerType when roleId changes
+      if (name === "roleId") {
+        const selectedRole = roles.find((role) => role.id === value);
+        if (selectedRole?.roleName === "Business Customer") {
+          updated.customerType = "Business";
+        } else if (selectedRole?.roleName === "Retail Customer") {
+          updated.customerType = "Retail";
+        }
+      }
+
+      return updated;
+    });
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    // Password is optional for updates
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (!formData.roleId) {
+      newErrors.roleId = "Role is required";
+    }
+
+    if (!formData.branchId) {
+      newErrors.branchId = "Branch is required";
+    }
+
+    if (!formData.contactNumber.trim()) {
+      newErrors.contactNumber = "Contact number is required";
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
+    }
+
+    // Only validate business-specific fields when customer type is Business
+    if (formData.customerType === "Business") {
+      if (!formData.district.trim()) {
+        newErrors.district = "District is required";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Create update payload - only include password if it was changed
+      const updateData = { ...formData };
+      if (!updateData.password) {
+        delete updateData.password;
+      }
+
+      await onSubmit(customer.id, updateData);
+      setErrors({});
+    } catch (error) {
+      console.error("Error updating customer:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    setFormData({
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      roleId: "",
+      branchId: "",
+      contactNumber: "",
+      businessName: "",
+      customerCode: "",
+      address: "",
+      district: "",
+      customerType: "",
+      assignedBranchId: "",
+      licenseNumber: "",
+    });
+    setErrors({});
+    onClose();
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Update Customer"
+      maxWidth="max-w-2xl"
+      footer={
+        <>
+          <Button
+            variant="secondary"
+            onClick={handleClose}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={submitting}>
+            {submitting ? "Updating..." : "Update Customer"}
+          </Button>
+        </>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* Full Name */}
+        <div>
+          <Input
+            label="Full Name"
+            name="name"
+            placeholder="Enter full name"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+          />
+        </div>
+
+        {/* Username and Email */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Username"
+            name="username"
+            placeholder="e.g. john_doe"
+            value={formData.username}
+            onChange={handleChange}
+            error={errors.username}
+          />
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="e.g. john@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+          />
+        </div>
+
+        {/* Address */}
+        <div>
+          <Input
+            label="Address"
+            name="address"
+            placeholder="Enter full address"
+            value={formData.address}
+            onChange={handleChange}
+            error={errors.address}
+          />
+        </div>
+
+        {/* Password and Contact Number */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Password (leave blank to keep current)"
+            name="password"
+            type="password"
+            placeholder="Enter new password"
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+          />
+          <Input
+            label="Contact Number"
+            name="contactNumber"
+            placeholder="e.g. 1234567890"
+            value={formData.contactNumber}
+            onChange={handleChange}
+            error={errors.contactNumber}
+          />
+        </div>
+
+        {/* Role and Branch - Read Only */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Select
+            label="Role"
+            name="roleId"
+            value={formData.roleId}
+            onChange={handleChange}
+            error={errors.roleId}
+            options={[
+              { value: "", label: "Select role" },
+              ...(roles
+                .filter(
+                  (role) =>
+                    role.roleName === "Retail Customer" ||
+                    role.roleName === "Business Customer",
+                )
+                .map((role) => ({
+                  value: role.id,
+                  label: role.roleName,
+                })) || []),
+            ]}
+          />
+          <Input
+            label="Branch"
+            name="branch"
+            value={customer?.branch?.name || ""}
+            disabled
+            placeholder="Branch"
+          />
+        </div>
+
+        {/* Business-specific fields - only show when customer type is Business */}
+        {formData.customerType === "Business" && (
+          <>
+            {/* Business Name and Customer Code */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Business Name"
+                name="businessName"
+                placeholder="e.g. ABC Company"
+                value={formData.businessName}
+                onChange={handleChange}
+                error={errors.businessName}
+              />
+              <Input
+                label="Customer Code"
+                name="customerCode"
+                placeholder="e.g. CUST001"
+                value={formData.customerCode}
+                onChange={handleChange}
+                error={errors.customerCode}
+              />
+            </div>
+
+            {/* District and License Number */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="District"
+                name="district"
+                placeholder="e.g. Colombo"
+                value={formData.district}
+                onChange={handleChange}
+                error={errors.district}
+              />
+              <Input
+                label="License Number (Optional)"
+                name="licenseNumber"
+                placeholder="e.g. LIC-12345"
+                value={formData.licenseNumber}
+                onChange={handleChange}
+                error={errors.licenseNumber}
+              />
+            </div>
+          </>
+        )}
+      </form>
+    </Modal>
+  );
+}

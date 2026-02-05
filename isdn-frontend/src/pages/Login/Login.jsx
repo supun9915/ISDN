@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, Layers } from "lucide-react";
-import { Button } from "../components/ui/Button";
-import { apiAdapter } from "../services/apiAdapter";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Button } from "../../components/ui/Button";
+import { apiAdapter } from "../../services/apiAdapter";
+import { LoginSignUpModel } from "./LoginSignUpModel";
 
 export function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -9,6 +10,7 @@ export function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,24 +44,27 @@ export function Login({ onLogin }) {
     }
   };
 
+  const handleSignUpSuccess = () => {
+    alert("Account created successfully! Please log in.");
+    setError("");
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Blue Gradient */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-800 via-teal-900 to-blue-950 relative overflow-hidden">
         {/* Subtle gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/20 to-transparent" />
 
         {/* Centered Logo & Brand */}
         <div className="relative z-10 flex flex-col items-center justify-center w-full px-12">
           <div className="bg-white rounded-2xl p-4 shadow-2xl shadow-blue-900/30 mb-6">
-            <Layers className="h-10 w-10 text-blue-600" />
+            <img
+              src="/companylogo.png"
+              alt="IslandLink Logo"
+              className="h-72 w-auto"
+            />
           </div>
-          <h1 className="text-white text-3xl font-bold tracking-tight">
-            IslandLink
-          </h1>
-          <p className="text-blue-200 mt-2 text-sm">
-            Centralized Sales & Distribution System
-          </p>
         </div>
       </div>
 
@@ -68,8 +73,12 @@ export function Login({ onLogin }) {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-8">
-            <div className="bg-blue-600 rounded-2xl p-3 mb-4">
-              <Layers className="h-8 w-8 text-white" />
+            <div className="bg-slate-100 rounded-2xl p-3 mb-4">
+              <img
+                src="/companylogo.png"
+                alt="IslandLink Logo"
+                className="h-8 w-auto"
+              />
             </div>
             <h1 className="text-slate-900 text-2xl font-bold">IslandLink</h1>
           </div>
@@ -148,14 +157,24 @@ export function Login({ onLogin }) {
                 </div>
               </div>
 
-              {/* Sign In Button */}
+              {/* Log In Button */}
               <Button
                 type="submit"
                 variant="outline"
                 className="w-full h-12 text-base font-medium mt-2"
                 isLoading={isLoading}
               >
-                Sign In
+                Log In
+              </Button>
+
+              {/* Sign Up Button */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 text-base font-medium mt-2"
+                onClick={() => setIsSignUpModalOpen(true)}
+              >
+                Sign Up
               </Button>
             </form>
           </div>
@@ -166,6 +185,13 @@ export function Login({ onLogin }) {
           </p>
         </div>
       </div>
+
+      {/* Sign Up Modal */}
+      <LoginSignUpModel
+        isOpen={isSignUpModalOpen}
+        onClose={() => setIsSignUpModalOpen(false)}
+        onSuccess={handleSignUpSuccess}
+      />
     </div>
   );
 }

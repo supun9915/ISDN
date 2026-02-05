@@ -11,7 +11,8 @@ class UserController {
   ): Promise<void> {
     try {
       const branchId = req.headers.branchid as string | undefined;
-      const users = await userService.getAllUsers(branchId);
+      const roleId = req.query.roleId as string | undefined;
+      const users = await userService.getAllUsers(branchId, roleId);
       // Remove password from response
       const sanitizedUsers = users.map((user) => {
         const { password, ...userWithoutPassword } = user;
