@@ -5,12 +5,18 @@ import { Orders } from "../pages/Orders";
 import { Users } from "../pages/Users/Users";
 import { Drivers } from "../pages/Drivers/Drivers";
 import { Customers } from "../pages/Customers/Customers";
+import { ProductCategory } from "../pages/ProductCategory/ProductCategory";
 
 export const routes = [
   {
     path: "dashboard",
     element: Dashboard,
     label: "Dashboard",
+  },
+  {
+    path: "product-categories",
+    element: ProductCategory,
+    label: "Product Categories",
   },
   {
     path: "inventory",
