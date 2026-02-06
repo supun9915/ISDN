@@ -104,7 +104,7 @@ model Product {
   id            BigInt     @id @default(autoincrement())
   productCode   String     @unique @map("product_code")
   name          String
-  category      String
+  categoryId    BigInt     @map("category_id")
   unitPrice     Decimal    @map("unit_price") @db.Decimal(10, 2)
   unitType      String     @map("unit_type")
   promotionId   BigInt?    @map("promotion_id")
@@ -113,6 +113,7 @@ model Product {
   active        Boolean    @default(true)
 
   // Relations
+  category      ProductCategory @relation(fields: [categoryId], references: [id])
   promotion     Promotion? @relation(fields: [promotionId], references: [id])
   inventories   Inventory[]
   orderItems    OrderItem[]
@@ -121,6 +122,16 @@ model Product {
   @@map("product")
 }
 
+
+model ProductCategory {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @unique
+  description String?  @db.Text
+
+  product    Product[]
+
+  @@map("product_category")
+}
 model Inventory {
   id               BigInt   @id @default(autoincrement())
   productId        BigInt   @map("product_id")

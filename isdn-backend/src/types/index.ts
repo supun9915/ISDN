@@ -131,3 +131,55 @@ export interface Vehicle {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ProductCategory {
+  id: bigint;
+  name: string;
+  description?: string | null;
+}
+
+export interface Product {
+  id: bigint;
+  productCode: string;
+  name: string;
+  categoryId: bigint;
+  unitPrice: Decimal;
+  unitType: string;
+  promotionId?: bigint | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  active: boolean;
+}
+
+export interface CreateProductCategoryDto {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateProductCategoryDto {
+  name?: string;
+  description?: string;
+}
+
+export interface CreateProductDto {
+  productCode: string;
+  name: string;
+  categoryId: bigint;
+  unitPrice: Decimal;
+  unitType: string;
+  promotionId?: bigint;
+  description?: string;
+  imageUrl?: string;
+}
+
+export interface UpdateProductDto {
+  productCode?: string;
+  name?: string;
+  categoryId?: bigint;
+  unitPrice?: Decimal;
+  unitType?: string;
+  promotionId?: bigint;
+  description?: string;
+  imageUrl?: string;
+  active?: boolean;
+}

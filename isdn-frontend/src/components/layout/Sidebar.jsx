@@ -50,6 +50,11 @@ export function Sidebar({
       icon: LayoutDashboard,
     },
     {
+      id: "product-categories",
+      label: "Product Categories",
+      icon: Package,
+    },
+    {
       id: "inventory",
       label: "Inventory",
       icon: Package,
