@@ -7,8 +7,15 @@ import "jspdf-autotable";
  * @param {Array} columns - Array of column definitions with key and header
  * @param {string} filename - Name of the PDF file
  * @param {string} title - Title of the report
+ * @param {string} description - Optional description text below the title
  */
-export const exportToPDF = (data, columns, filename, title) => {
+export const exportToPDF = (
+  data,
+  columns,
+  filename,
+  title,
+  description = "",
+) => {
   // Create new PDF document
   const doc = new jsPDF();
 
@@ -16,9 +23,21 @@ export const exportToPDF = (data, columns, filename, title) => {
   doc.setFontSize(16);
   doc.text(title, 14, 15);
 
+  // Add description if provided
+  let currentY = 22;
+  if (description) {
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    const descLines = doc.splitTextToSize(description, 180);
+    doc.text(descLines, 14, currentY);
+    currentY += descLines.length * 5;
+    doc.setTextColor(0, 0, 0);
+  }
+
   // Add date
   doc.setFontSize(10);
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, currentY);
+  currentY += 6;
 
   // Prepare table headers
   const headers = columns.map((col) => col.header);
@@ -58,7 +77,7 @@ export const exportToPDF = (data, columns, filename, title) => {
 
   // Add table
   doc.autoTable({
-    startY: 28,
+    startY: currentY,
     head: [headers],
     body: tableData,
     theme: "grid",

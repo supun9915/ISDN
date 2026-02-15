@@ -54,7 +54,10 @@ class OrderService {
     return await orderRepository.findByBranchId(branchId);
   }
 
-  async getOrdersByStatus(status: string): Promise<Order[]> {
+  async getOrdersByStatus(
+    status: string,
+    branchId?: string | number,
+  ): Promise<Order[]> {
     const validStatuses = [
       "Pending",
       "Confirmed",
@@ -70,7 +73,10 @@ class OrderService {
       );
     }
 
-    return await orderRepository.findByStatus(status);
+    return await orderRepository.findByStatus(
+      status,
+      branchId ? BigInt(branchId) : undefined,
+    );
   }
 
   async getOrdersByDriverId(driverId: string | number): Promise<Order[]> {
@@ -292,7 +298,10 @@ class OrderService {
     return updatedOrder;
   }
 
-  async getOrdersByStatusList(statusList: string[]): Promise<Order[]> {
+  async getOrdersByStatusList(
+    statusList: string[],
+    branchId?: string | number,
+  ): Promise<Order[]> {
     const validStatuses = [
       "Pending",
       "Confirmed",
@@ -312,7 +321,10 @@ class OrderService {
       }
     }
 
-    return await orderRepository.findByStatusList(statusList);
+    return await orderRepository.findByStatusList(
+      statusList,
+      branchId ? BigInt(branchId) : undefined,
+    );
   }
 }
 
