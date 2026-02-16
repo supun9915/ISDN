@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MainLayout } from "./components/layout/MainLayout";
-import { Login } from "./pages/Login";
-import { ToastContainer } from "./components/feedback/ToastContainer";
-import { useToast } from "./hooks/useToast";
+import { Login } from "./pages/Login/Login";
+import { ToastProvider, useToast } from "./context/ToastContext";
 import { branches } from "./data/mockData";
 import { apiAdapter } from "./services/apiAdapter";
 import { getRouteComponent } from "./routes";
@@ -27,11 +26,35 @@ const getCurrentBranchId = () => {
   return localStorage.getItem("branchId");
 };
 
-export function App() {
+// Helper function to get default page based on user role
+const getDefaultPageForRole = (role) => {
+  switch (role) {
+    case "Business Customer":
+    case "Retail Customer":
+      return "customer-products";
+    case "Driver":
+      return "deliveries";
+    case "System Administrator":
+      return "adminUsers";
+    case "RDC Staff":
+    case "Logistics Officer":
+    case "Head Office Manager":
+    default:
+      return "dashboard";
+  }
+};
+
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState(() => {
+    const user = getCurrentUser();
+    if (user?.role?.roleName) {
+      return getDefaultPageForRole(user.role.roleName);
+    }
+    return "dashboard";
+  });
   const [currentBranchId, setCurrentBranchId] = useState("1");
-  const { toasts, addToast, removeToast } = useToast();
+  const { addToast } = useToast();
 
   // Initialize authentication state from localStorage and fetch current user
   useEffect(() => {
@@ -80,6 +103,11 @@ export function App() {
       setCurrentBranchId(userBranchId);
     }
 
+    // Set the appropriate initial page based on user role
+    if (user?.role?.roleName) {
+      setActivePage(getDefaultPageForRole(user.role.roleName));
+    }
+
     addToast(
       "success",
       `Welcome back, ${user?.name || user?.username || "User"}! You have successfully signed in.`,
@@ -93,6 +121,7 @@ export function App() {
     localStorage.removeItem("branchId");
     localStorage.removeItem("username");
     localStorage.removeItem("userRole");
+    localStorage.clear(); // Clear all localStorage (optional, if you want to clear everything)
 
     // Update state to navigate to login
     setIsAuthenticated(false);
@@ -134,28 +163,28 @@ export function App() {
 
   // Show Login page if not authenticated
   if (!isAuthenticated) {
-    return (
-      <>
-        <Login onLogin={handleLogin} />
-        <ToastContainer toasts={toasts} removeToast={removeToast} />
-      </>
-    );
+    return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <>
-      <MainLayout
-        activePage={activePage}
-        onNavigate={setActivePage}
-        currentBranch={currentBranch}
-        branches={branches}
-        onSwitchBranch={handleSwitchBranch}
-        onLogout={handleLogout}
-        user={currentUser}
-      >
-        {renderPage()}
-      </MainLayout>
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-    </>
+    <MainLayout
+      activePage={activePage}
+      onNavigate={setActivePage}
+      currentBranch={currentBranch}
+      branches={branches}
+      onSwitchBranch={handleSwitchBranch}
+      onLogout={handleLogout}
+      user={currentUser}
+    >
+      {renderPage()}
+    </MainLayout>
+  );
+}
+
+export function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 }

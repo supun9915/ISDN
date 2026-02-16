@@ -11,7 +11,8 @@ class UserController {
   ): Promise<void> {
     try {
       const branchId = req.headers.branchid as string | undefined;
-      const users = await userService.getAllUsers(branchId);
+      const roleId = req.query.roleId as string | undefined;
+      const users = await userService.getAllUsers(branchId, roleId);
       // Remove password from response
       const sanitizedUsers = users.map((user) => {
         const { password, ...userWithoutPassword } = user;
@@ -42,6 +43,53 @@ class UserController {
         success: true,
         data: serializeBigInt(userWithoutPassword),
         message: "User retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUsersByRoleName(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { roleName } = req.query;
+      const branchId = req.headers.branchid as string | undefined;
+
+      if (!roleName) {
+        res.status(400).json({
+          success: false,
+          message: "Role name is required",
+        });
+        return;
+      }
+
+      const users = await userService.getUsersByRoleName(
+        roleName as string,
+        branchId,
+      );
+
+      // Remove password from response
+      const sanitizedUsers = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+
+      if (sanitizedUsers.length === 0) {
+        res.status(404).json({
+          success: false,
+          message: `No users found with role: ${roleName}`,
+          data: [],
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: serializeBigInt(sanitizedUsers),
+        message: "Users retrieved successfully",
       });
     } catch (error) {
       next(error);

@@ -7,6 +7,7 @@ import { Plus, Search } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { UserCreateModel } from "./models/UserCreateModel";
 import { UserUpdateModel } from "./models/UserUpdateModel";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Users() {
   const [users, setUsers] = useState([]);
@@ -18,13 +19,25 @@ export function Users() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
+
+  const allowedRoles = [
+    "RDC Staff",
+    "Logistics Officer",
+    "Head Office Manager",
+  ];
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    const matchesRole = allowedRoles.includes(user.role?.roleName);
+    return matchesSearch && matchesRole;
   });
 
   const columns = [
@@ -106,14 +119,28 @@ export function Users() {
     setLoading(true);
     console.log("Get Users");
     try {
-      const response = await apiAdapter.get("/users", {
-        branchId: currentUser?.branchId || null,
-      });
+      const config = currentUser?.branchId
+        ? { params: { branchId: currentUser.branchId } } // or headers if it's a header
+        : {};
+
+      const response = await apiAdapter.get("/users", config);
+
       if (response.success && response.data) {
         setUsers(response.data);
+      } else if (!response.success && response.message) {
+        setAlertModal({
+          isOpen: true,
+          message: response.message,
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch users:", error);
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to fetch users",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -146,11 +173,26 @@ export function Users() {
       const response = await apiAdapter.post("/users/", userData);
       if (response.success) {
         setIsCreateModalOpen(false);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "User created successfully",
+          isSuccess: true,
+        });
         fetchUsers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create user",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to create user:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to create user",
+        isSuccess: false,
+      });
     }
   };
 
@@ -160,11 +202,26 @@ export function Users() {
       if (response.success) {
         setIsUpdateModalOpen(false);
         setSelectedUser(null);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "User updated successfully",
+          isSuccess: true,
+        });
         fetchUsers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update user",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to update user:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to update user",
+        isSuccess: false,
+      });
     }
   };
 
@@ -178,10 +235,26 @@ export function Users() {
       try {
         const response = await apiAdapter.delete(`/users/${user.id}`);
         if (response.success) {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "User deleted successfully",
+            isSuccess: true,
+          });
           fetchUsers();
+        } else {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Failed to delete user",
+            isSuccess: false,
+          });
         }
       } catch (error) {
         console.error("Failed to delete user:", error);
+        setAlertModal({
+          isOpen: true,
+          message: error.message || "Failed to delete user",
+          isSuccess: false,
+        });
       }
     }
   };
@@ -250,6 +323,16 @@ export function Users() {
         user={selectedUser}
         roles={roles}
         branches={branches}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

@@ -14,16 +14,14 @@ router.patch(
 // Get all users
 router.get("/", authenticate, userController.getAllUsers);
 
+// Get users by role name (using query parameter, must come before /:id)
+router.get("/role", authenticate, userController.getUsersByRoleName);
+
 // Get user by ID
 router.get("/:id", authenticate, userController.getUserById);
 
 // Create new user
-router.post(
-  "/",
-  authenticate,
-  authorize(["Super Admin", "Admin"]),
-  userController.createUser,
-);
+router.post("/", userController.createUser);
 
 // Update user
 router.put("/:id", authenticate, userController.updateUser);
@@ -32,7 +30,7 @@ router.put("/:id", authenticate, userController.updateUser);
 router.delete(
   "/:id",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   userController.deleteUser,
 );
 
@@ -40,7 +38,7 @@ router.delete(
 router.patch(
   "/:id/activate",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   userController.activateUser,
 );
 

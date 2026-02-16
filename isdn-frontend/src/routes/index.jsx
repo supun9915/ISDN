@@ -1,8 +1,16 @@
-import React from "react";
-import { Dashboard } from "../pages/Dashboard";
-import { Inventory } from "../pages/Inventory";
-import { Orders } from "../pages/Orders";
+import { Dashboard } from "../pages/Dashboard/Dashboard";
+import { ActiveOrders } from "../pages/ActiveOrders/ActiveOrders";
 import { Users } from "../pages/Users/Users";
+import { Drivers } from "../pages/Drivers/Drivers";
+import { Customers } from "../pages/Customers/Customers";
+import { ProductCategory } from "../pages/ProductCategory/ProductCategory";
+import { Product } from "../pages/Product/Product";
+import { Inventory } from "../pages/Inventory/Inventory";
+import { CustomerProduct } from "../pages/CustomerProduct/CustomerProduct";
+import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
+import { Account } from "../pages/Account/Account";
+import { Deliveries } from "../pages/Deliveries/Deliveries";
+import { DeliveredOrders } from "../pages/DeliveredOrders/DeliveredOrders";
 
 export const routes = [
   {
@@ -11,19 +19,64 @@ export const routes = [
     label: "Dashboard",
   },
   {
+    path: "product-categories",
+    element: ProductCategory,
+    label: "Product Categories",
+  },
+  {
+    path: "customer-products",
+    element: CustomerProduct,
+    label: "Customer Products",
+  },
+  {
+    path: "products",
+    element: Product,
+    label: "Products",
+  },
+  {
     path: "inventory",
     element: Inventory,
     label: "Inventory",
   },
   {
-    path: "orders",
-    element: Orders,
-    label: "Orders",
+    path: "active-orders",
+    element: ActiveOrders,
+    label: "Active Orders",
   },
   {
-    path: "users",
+    path: "delivered-orders",
+    element: DeliveredOrders,
+    label: "Delivered Orders",
+  },
+  {
+    path: "orders-history",
+    element: OrdersHistory,
+    label: "Orders History",
+  },
+  {
+    path: "deliveries",
+    element: Deliveries,
+    label: "Deliveries",
+  },
+  {
+    path: "adminUsers",
     element: Users,
-    label: "Users",
+    label: "Admin Users",
+  },
+  {
+    path: "drivers",
+    element: Drivers,
+    label: "Drivers",
+  },
+  {
+    path: "customers",
+    element: Customers,
+    label: "Customers",
+  },
+  {
+    path: "account",
+    element: Account,
+    label: "My Account",
   },
 ];
 

@@ -59,10 +59,34 @@ class UserRepository {
     });
   }
 
-  async create(userData: CreateUserDto): Promise<User> {
+  async findByCustomerCode(customerCode: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { customerCode },
+      include: {
+        role: true,
+        branch: true,
+      },
+    });
+  }
+
+  async create(
+    userData: CreateUserDto & { vehicleId?: bigint },
+  ): Promise<User> {
     return await prisma.user.create({
       data: {
-        ...userData,
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        name: userData.name,
+        contactNumber: userData.contactNumber,
+        businessName: userData.businessName || null,
+        customerCode: userData.customerCode || null,
+        address: userData.address,
+        district: userData.district || null,
+        customerType: userData.customerType || null,
+        licenseNumber: userData.licenseNumber || null,
+        latitude: userData.latitude,
+        longitude: userData.longitude,
         roleId: BigInt(userData.roleId),
         branchId: userData.branchId ? BigInt(userData.branchId) : null,
         assignedBranchId: userData.assignedBranchId
@@ -84,12 +108,36 @@ class UserRepository {
       where: { id: BigInt(id) },
       data: {
         ...userData,
+        customerCode:
+          userData.customerCode !== undefined
+            ? userData.customerCode || null
+            : undefined,
+        businessName:
+          userData.businessName !== undefined
+            ? userData.businessName || null
+            : undefined,
+        district:
+          userData.district !== undefined
+            ? userData.district || null
+            : undefined,
+        customerType:
+          userData.customerType !== undefined
+            ? userData.customerType || null
+            : undefined,
+        licenseNumber:
+          userData.licenseNumber !== undefined
+            ? userData.licenseNumber || null
+            : undefined,
         roleId: userData.roleId ? BigInt(userData.roleId) : undefined,
         branchId: userData.branchId ? BigInt(userData.branchId) : undefined,
         assignedBranchId: userData.assignedBranchId
           ? BigInt(userData.assignedBranchId)
           : undefined,
         vehicleId: userData.vehicleId ? BigInt(userData.vehicleId) : undefined,
+        latitude:
+          userData.latitude !== undefined ? userData.latitude : undefined,
+        longitude:
+          userData.longitude !== undefined ? userData.longitude : undefined,
       },
       include: {
         role: true,
@@ -115,6 +163,49 @@ class UserRepository {
       data: { password: hashedPassword },
     });
   }
-}
 
+  async getRoleNameById(roleId: bigint): Promise<string | null> {
+    const role = await prisma.role.findUnique({
+      where: { id: BigInt(roleId) },
+      select: { roleName: true },
+    });
+    return role?.roleName || null;
+  }
+
+  async findByRoleName(roleName: string): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: {
+        role: {
+          roleName,
+        },
+      },
+      include: {
+        role: true,
+        branch: true,
+        assignedBranch: true,
+        vehicle: true,
+      },
+    });
+  }
+
+  async findByRoleNameAndBranchId(
+    roleName: string,
+    branchId: string,
+  ): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: {
+        role: {
+          roleName,
+        },
+        branchId: BigInt(branchId),
+      },
+      include: {
+        role: true,
+        branch: true,
+        assignedBranch: true,
+        vehicle: true,
+      },
+    });
+  }
+}
 export default new UserRepository();
