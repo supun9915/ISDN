@@ -211,6 +211,7 @@ export function ActiveOrders() {
       exportColumns,
       "active-orders-report",
       "Active Orders Report",
+      "This report includes all active orders currently in the system with statuses: Pending, Confirmed, Processing, Ready, and Dispatched. Use this report to track order progress and manage deliveries.",
     );
   };
 
@@ -366,10 +367,10 @@ export function ActiveOrders() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            My Orders
+            Active Orders
           </h1>
           <p className="text-slate-500 mt-1 text-sm hidden sm:block">
-            View and track your order history.
+            View and manage all active orders in the system.
           </p>
         </div>
         <Button

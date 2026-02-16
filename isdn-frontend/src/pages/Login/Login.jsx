@@ -181,7 +181,7 @@ export function Login({ onLogin }) {
 
           {/* Footer Text */}
           <p className="text-center text-xs text-slate-400 mt-6">
-            © 2024 IslandLink Systems. All rights reserved.
+            {`© ${new Date().getFullYear()} IslandLink Systems. All rights reserved.`}
           </p>
         </div>
       </div>

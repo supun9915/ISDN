@@ -292,9 +292,9 @@ class OrderRepository {
     });
   }
 
-  async findByStatus(status: string): Promise<Order[]> {
+  async findByStatus(status: string, branchId?: bigint): Promise<Order[]> {
     return await prisma.order.findMany({
-      where: { status },
+      where: { status, branchId: branchId ? branchId : undefined },
       include: {
         user: {
           select: {
@@ -766,9 +766,15 @@ class OrderRepository {
     return `${datePrefix}${String(sequence).padStart(4, "0")}`;
   }
 
-  async findByStatusList(statusList: string[]): Promise<Order[]> {
+  async findByStatusList(
+    statusList: string[],
+    branchId?: bigint,
+  ): Promise<Order[]> {
     return await prisma.order.findMany({
-      where: { status: { in: statusList } },
+      where: {
+        status: { in: statusList },
+        branchId: branchId ? branchId : undefined,
+      },
       include: {
         user: {
           select: {

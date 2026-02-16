@@ -327,13 +327,6 @@ export function Customers() {
             Manage system customers and their permissions.
           </p>
         </div>
-        <Button
-          onClick={() => setIsCreateModalOpen(true)}
-          leftIcon={<Plus className="h-4 w-4" />}
-          className="w-full sm:w-auto"
-        >
-          Add Customer
-        </Button>
       </div>
 
       {/* Search */}

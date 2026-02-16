@@ -142,28 +142,6 @@ export function Drivers() {
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const response = await apiAdapter.get("/roles");
-      if (response.success && response.data) {
-        setRoles(response.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch roles:", error);
-    }
-  };
-
-  const fetchBranches = async () => {
-    try {
-      const response = await apiAdapter.get("/branches");
-      if (response.success && response.data) {
-        setBranches(response.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch branches:", error);
-    }
-  };
-
   const handleCreateDriver = async (driverData) => {
     try {
       const response = await apiAdapter.post("/users/", driverData);
@@ -189,6 +167,28 @@ export function Drivers() {
         message: error.message || "Failed to create driver",
         isSuccess: false,
       });
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await apiAdapter.get("/roles");
+      if (response.success && response.data) {
+        setRoles(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch roles:", error);
+    }
+  };
+
+  const fetchBranches = async () => {
+    try {
+      const response = await apiAdapter.get("/branches");
+      if (response.success && response.data) {
+        setBranches(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch branches:", error);
     }
   };
 

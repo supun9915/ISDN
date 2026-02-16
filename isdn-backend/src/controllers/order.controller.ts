@@ -21,10 +21,25 @@ class OrderController {
 
       if (userId) {
         orders = await orderService.getOrdersByUserId(userId as string);
+      } else if (status) {
+        // Check if status contains comma-separated values
+        const statusStr = status as string;
+        if (statusStr.includes(",")) {
+          // Multiple statuses - use getOrdersByStatusList
+          const statusList = statusStr.split(",").map((s) => s.trim());
+          orders = await orderService.getOrdersByStatusList(
+            statusList,
+            branchId as string,
+          );
+        } else {
+          // Single status - use getOrdersByStatus
+          orders = await orderService.getOrdersByStatus(
+            statusStr,
+            branchId as string,
+          );
+        }
       } else if (branchId) {
         orders = await orderService.getOrdersByBranchId(branchId as string);
-      } else if (status) {
-        orders = await orderService.getOrdersByStatus(status as string);
       } else {
         orders = await orderService.getAllOrders();
       }
@@ -128,7 +143,7 @@ class OrderController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { status } = req.query;
+      const { status, branchId } = req.query;
       if (!status) {
         res.status(400).json({
           success: false,
@@ -137,7 +152,10 @@ class OrderController {
         return;
       }
       const statusList = (status as string).split(",").map((s) => s.trim());
-      const orders = await orderService.getOrdersByStatusList(statusList);
+      const orders = await orderService.getOrdersByStatusList(
+        statusList,
+        branchId as string,
+      );
       res.json({
         success: true,
         data: serializeBigInt(orders),

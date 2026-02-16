@@ -294,6 +294,7 @@ export function Inventory() {
       exportColumns,
       "inventory-report",
       "Inventory Report",
+      "Comprehensive inventory report showing current stock levels, product details, pricing, and unit information for all products in your branch. Use this report for stock management and inventory audits.",
     );
   };
 
@@ -472,10 +473,10 @@ export function Inventory() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Products
+            Inventory Management
           </h1>
           <p className="text-slate-500 mt-1 text-sm hidden sm:block">
-            Manage system products and their details.
+            Manage products, update stock levels, and transfer inventory
           </p>
         </div>
         <Button

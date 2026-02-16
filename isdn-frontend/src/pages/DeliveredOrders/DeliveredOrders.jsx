@@ -279,10 +279,10 @@ export function DeliveredOrders() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            My Orders
+            Delivered Orders
           </h1>
           <p className="text-slate-500 mt-1 text-sm hidden sm:block">
-            View and track your order history.
+            View and manage all delivered orders in the system.
           </p>
         </div>
         <Button

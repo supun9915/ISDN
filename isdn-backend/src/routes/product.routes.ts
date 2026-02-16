@@ -40,7 +40,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorize(["System Administrator"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.deleteProduct,
 );
 
