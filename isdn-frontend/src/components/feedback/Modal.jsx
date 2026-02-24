@@ -8,6 +8,7 @@ export function Modal({
   children,
   footer,
   maxWidth = "max-w-lg",
+  zIndex = "z-[40]",
 }) {
   useEffect(() => {
     const handleEscape = (e) => {
@@ -28,7 +29,9 @@ export function Modal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6">
+    <div
+      className={`fixed inset-0 ${zIndex} flex items-center justify-center p-4 sm:p-6`}
+    >
       <div
         className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
