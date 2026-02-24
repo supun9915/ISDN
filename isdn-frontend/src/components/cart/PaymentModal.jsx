@@ -190,6 +190,7 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
       onClose={onClose}
       title="Checkout - Complete your order"
       maxWidth="max-w-7xl"
+      zIndex="z-[50]"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Two Column Layout */}
