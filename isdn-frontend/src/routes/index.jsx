@@ -11,6 +11,12 @@ import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
 import { Account } from "../pages/Account/Account";
 import { Deliveries } from "../pages/Deliveries/Deliveries";
 import { DeliveredOrders } from "../pages/DeliveredOrders/DeliveredOrders";
+import { CreateTransfer } from "../pages/StockTransfer/CreateTransfer";
+import { TransferList } from "../pages/StockTransfer/TransferList";
+import { ProductCatalog } from "../pages/Customer/ProductCatalog";
+import { ShoppingCart } from "../pages/Customer/ShoppingCart";
+import { Checkout } from "../pages/Customer/Checkout";
+import { MyOrders } from "../pages/Customer/MyOrders";
 
 export const routes = [
   {
@@ -77,6 +83,36 @@ export const routes = [
     path: "account",
     element: Account,
     label: "My Account",
+  },
+  {
+    path: "create-transfer",
+    element: CreateTransfer,
+    label: "Create Transfer",
+  },
+  {
+    path: "stock-transfers",
+    element: TransferList,
+    label: "Stock Transfers",
+  },
+  {
+    path: "product-catalog",
+    element: ProductCatalog,
+    label: "Product Catalog",
+  },
+  {
+    path: "shopping-cart",
+    element: ShoppingCart,
+    label: "Shopping Cart",
+  },
+  {
+    path: "checkout",
+    element: Checkout,
+    label: "Checkout",
+  },
+  {
+    path: "my-orders",
+    element: MyOrders,
+    label: "My Orders",
   },
 ];
 

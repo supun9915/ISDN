@@ -16,7 +16,11 @@ import {
   UserRoundCog,
   LogOut,
   UserRoundPen,
+  ArrowLeftRight,
   X,
+  Store,
+  ClipboardList,
+  CreditCard,
 } from "lucide-react";
 
 export function Sidebar({
@@ -74,6 +78,30 @@ export function Sidebar({
       roles: ["Business Customer", "Retail Customer"],
     },
     {
+      id: "product-catalog",
+      label: "Product Catalog",
+      icon: Store,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "shopping-cart",
+      label: "Shopping Cart",
+      icon: ShoppingCart,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "checkout",
+      label: "Checkout",
+      icon: CreditCard,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "my-orders",
+      label: "My Orders",
+      icon: ClipboardList,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
       id: "products",
       label: "Products",
       icon: Package,
@@ -84,6 +112,28 @@ export function Sidebar({
       label: "Inventory",
       icon: Archive,
       roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
+    },
+    {
+      id: "create-transfer",
+      label: "Create Transfer",
+      icon: ArrowLeftRight,
+      roles: [
+        "System Administrator",
+        "Head Office Manager",
+        "RDC Staff",
+        "Logistics Officer",
+      ],
+    },
+    {
+      id: "stock-transfers",
+      label: "Stock Transfers",
+      icon: ArrowLeftRight,
+      roles: [
+        "System Administrator",
+        "Head Office Manager",
+        "RDC Staff",
+        "Logistics Officer",
+      ],
     },
     {
       id: "active-orders",
